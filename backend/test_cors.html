@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>Testing CORS</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testRegister()">Test Registration</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'admin@loanapp.com',
+                        password: 'Admin123!'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Login Result:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Login Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+
+        async function testRegister() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        firstName: 'Test',
+                        lastName: 'User',
+                        email: 'testuser' + Date.now() + '@example.com',
+                        password: 'Password123!',
+                        phone: '1234567890',
+                        dateOfBirth: '1990-01-01',
+                        address: {
+                            street: '123 Test St',
+                            city: 'Test City',
+                            state: 'TS',
+                            zipCode: '12345'
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Registration Result:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Registration Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html>
