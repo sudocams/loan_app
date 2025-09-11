@@ -146,11 +146,11 @@ The system includes seeded accounts for testing:
 
 **Admin Account:**
 - Email: `admin@loanapp.com`
-- Password: `Admin123!`
+- Password: `Admin123456789!`
 
 **Loan Officer Account:**
 - Email: `officer@loanapp.com`
-- Password: `Officer123!`
+- Password: `Officer123456789!`
 
 ## 📱 API Documentation
 
