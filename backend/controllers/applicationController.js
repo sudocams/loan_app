@@ -27,7 +27,7 @@ const createApplication = async (req, res) => {
         requestedAmount > loanProductData.loanAmount.max) {
       return res.status(400).json({
         success: false,
-        message: `Requested amount must be between $${loanProductData.loanAmount.min} and $${loanProductData.loanAmount.max}`,
+        message: `Requested amount must be between KSh ${loanProductData.loanAmount.min} and KSh ${loanProductData.loanAmount.max}`,
       });
     }
 
@@ -98,7 +98,7 @@ const getUserApplications = async (req, res) => {
         {
           model: LoanProduct,
           as: 'loanProduct',
-          attributes: ['name', 'type', 'interestRate']
+          attributes: ['name', 'type', 'interestRateMin', 'interestRateMax']
         },
         {
           model: User,
@@ -146,7 +146,7 @@ const getApplication = async (req, res) => {
         {
           model: LoanProduct,
           as: 'loanProduct',
-          attributes: ['name', 'type', 'description', 'interestRate', 'loanAmount', 'termLength']
+          attributes: ['name', 'type', 'description', 'interestRateMin', 'interestRateMax', 'loanAmountMin', 'loanAmountMax', 'termLengthMin', 'termLengthMax']
         },
         {
           model: User,
@@ -693,15 +693,46 @@ const submitLoanApplication = async (req, res) => {
     // Generate application ID
     const applicationId = 'LA' + Date.now() + Math.floor(Math.random() * 1000);
 
-    // Create application
+    // Get first available loan product (seeding should ensure at least one exists)
+    const { LoanProduct } = require('../models');
+    let defaultLoanProduct = await LoanProduct.findOne({ where: { isActive: true } });
+    
+    // If no active loan product exists, create one for our simplified system
+    if (!defaultLoanProduct) {
+      defaultLoanProduct = await LoanProduct.create({
+        name: 'Welfare Loan',
+        description: 'Simplified welfare loan for amounts between KSh 1,000 - 20,000',
+        type: 'personal',
+        interestRateMin: 0,
+        interestRateMax: 0,
+        loanAmountMin: 1000,
+        loanAmountMax: 20000,
+        termLengthMin: 1,
+        termLengthMax: 12,
+        minCreditScore: 0,
+        minIncome: 0,
+        maxDebtToIncomeRatio: 1.0,
+        minAge: 18,
+        employmentRequired: false,
+        originationFee: 0,
+        processingFee: 0,
+        prepaymentPenalty: 0,
+        requiredDocuments: [],
+        isActive: true
+      });
+    }
+
+    // Create application with default values for required fields
     const application = await LoanApplication.create({
       applicationId,
       applicantId: req.user.id,
+      loanProductId: defaultLoanProduct.id,
       requestedAmount,
+      requestedTerm: Math.max(defaultLoanProduct.termLengthMin, 6), // Use minimum term from loan product or at least 6 months
       purpose,
       purposeDescription: purposeDescription || '',
-      fee: calculatedFee,
-      totalAmount: requestedAmount + calculatedFee,
+      annualIncome: 0, // Default to 0, can be updated later
+      monthlyExpenses: 0, // Default to 0, can be updated later
       status: 'submitted',
       submittedAt: new Date()
     });
@@ -715,9 +746,9 @@ const submitLoanApplication = async (req, res) => {
         application: {
           applicationId: application.applicationId,
           requestedAmount: application.requestedAmount,
-          fee: application.fee,
-          totalAmount: application.totalAmount,
+          requestedTerm: application.requestedTerm,
           purpose: application.purpose,
+          purposeDescription: application.purposeDescription,
           status: application.status,
           submittedAt: application.submittedAt
         }

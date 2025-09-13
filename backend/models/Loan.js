@@ -30,7 +30,7 @@ const Loan = sequelize.define('Loan', {
   },
   loanProductId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Made optional for simple loan system
     references: {
       model: 'LoanProducts',
       key: 'id'
@@ -97,12 +97,16 @@ const Loan = sequelize.define('Loan', {
     defaultValue: [],
   },
   status: {
-    type: DataTypes.ENUM('active', 'paid_off', 'defaulted', 'cancelled'),
+    type: DataTypes.ENUM('active', 'paid', 'paid_off', 'overdue', 'defaulted', 'cancelled'),
     defaultValue: 'active',
   },
   currentBalance: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
+  },
+  amountPaid: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
   },
   nextPaymentAmount: {
     type: DataTypes.DECIMAL(8, 2),
@@ -151,6 +155,10 @@ const Loan = sequelize.define('Loan', {
   maturityDate: {
     type: DataTypes.DATE,
     allowNull: false,
+  },
+  paidAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
 }, {
   timestamps: true,

@@ -131,7 +131,7 @@ const seedAdminUser = async () => {
       firstName: 'Admin',
       lastName: 'User',
       email: 'admin@loanapp.com',
-      password: 'Admin123!',
+      password: 'Admin123456789!',
       phone: '+1234567890',
       dateOfBirth: new Date('1990-01-01'),
       street: '123 Admin Street',
@@ -143,7 +143,7 @@ const seedAdminUser = async () => {
       isEmailVerified: true,
     });
 
-    logger.info('Admin user created: admin@loanapp.com / Admin123!');
+    logger.info('Admin user created: admin@loanapp.com / Admin123456789!');
   } catch (error) {
     logger.error('Error seeding admin user:', error);
   }
@@ -161,7 +161,7 @@ const seedLoanOfficer = async () => {
       firstName: 'John',
       lastName: 'Officer',
       email: 'officer@loanapp.com',
-      password: 'Officer123!',
+      password: 'Officer123456789!',
       phone: '+1234567891',
       dateOfBirth: new Date('1985-05-15'),
       street: '456 Officer Lane',
@@ -173,7 +173,7 @@ const seedLoanOfficer = async () => {
       isEmailVerified: true,
     });
 
-    logger.info('Loan officer created: officer@loanapp.com / Officer123!');
+    logger.info('Loan officer created: officer@loanapp.com / Officer123456789!');
   } catch (error) {
     logger.error('Error seeding loan officer:', error);
   }
@@ -181,7 +181,8 @@ const seedLoanOfficer = async () => {
 
 const seedDatabase = async () => {
   try {
-    await seedLoanProducts();
+    // Commented out seedLoanProducts since we're using simple loan system
+    // await seedLoanProducts();
     await seedAdminUser();
     await seedLoanOfficer();
     logger.info('Database seeding completed');

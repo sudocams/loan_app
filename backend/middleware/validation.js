@@ -62,7 +62,7 @@ const validateLoanApplication = [
     .withMessage('Requested amount must be a number')
     .custom((value) => {
       if (value < 1000) {
-        throw new Error('Minimum loan amount is $1,000');
+        throw new Error('Minimum loan amount is KSh 1,000');
       }
       return true;
     }),

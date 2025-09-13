@@ -11,7 +11,6 @@ const User = sequelize.define('User', {
   username: {
     type: DataTypes.STRING(50),
     allowNull: true,
-    unique: true,
     validate: {
       len: [3, 50]
     }
@@ -50,6 +49,10 @@ const User = sequelize.define('User', {
     }
   },
   phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  phoneNumber: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -121,8 +124,21 @@ const User = sequelize.define('User', {
     type: DataTypes.JSON,
     defaultValue: [],
   },
+  lastLoginAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ['email']
+    },
+    {
+      fields: ['role']
+    }
+  ],
   hooks: {
     beforeSave: async (user) => {
       if (user.changed('password')) {

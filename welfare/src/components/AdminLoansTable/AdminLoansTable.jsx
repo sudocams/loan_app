@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminService } from '../services/adminService';
+import { adminService } from '../../services/adminService';
 import './AdminLoansTable.css';
 
 const AdminLoansTable = () => {
@@ -9,17 +9,31 @@ const AdminLoansTable = () => {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [assigningLoan, setAssigningLoan] = useState(null);
+  const [loanOfficers, setLoanOfficers] = useState([]);
 
   useEffect(() => {
     fetchLoans();
+    fetchLoanOfficers();
   }, []);
+
+  const fetchLoanOfficers = async () => {
+    try {
+      const response = await adminService.getLoanOfficers();
+      if (response.success) {
+        setLoanOfficers(response.data.officers || []);
+      }
+    } catch (error) {
+      console.error('Error fetching loan officers:', error);
+    }
+  };
 
   const fetchLoans = async () => {
     try {
       setLoading(true);
       const response = await adminService.getAllApplications();
-      if (response.data.success) {
-        setLoans(response.data.data.applications);
+      if (response.success) {
+        setLoans(response.data.applications);
       } else {
         setError('Failed to fetch loans');
       }
@@ -46,6 +60,70 @@ const AdminLoansTable = () => {
       currency: 'KES',
       minimumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const calculateLoanFee = (amount) => {
+    const numAmount = parseFloat(amount);
+    if (numAmount >= 1000 && numAmount <= 5000) return 100;
+    if (numAmount > 5000 && numAmount <= 10000) return 200;
+    if (numAmount > 10000 && numAmount <= 15000) return 300;
+    if (numAmount > 15000 && numAmount <= 20000) return 500;
+    return 0;
+  };
+
+  const handleAssignOfficer = async (loanId, officerId) => {
+    try {
+      setAssigningLoan(loanId);
+      await adminService.assignOfficer(loanId, officerId);
+      await fetchLoans(); // Refresh the table
+      setAssigningLoan(null);
+    } catch (error) {
+      console.error('Error assigning officer:', error);
+      setError('Failed to assign officer');
+      setAssigningLoan(null);
+    }
+  };
+
+  const handleApprove = async (loanId) => {
+    try {
+      setAssigningLoan(loanId);
+      const response = await adminService.reviewApplication(loanId, { 
+        status: 'approved',
+        reviewComments: 'Application approved'
+      });
+      
+      if (response.success) {
+        await fetchLoans();
+        setAssigningLoan(null);
+        setError(''); // Clear any previous errors
+      } else {
+        setError(response.message || 'Failed to approve application');
+        setAssigningLoan(null);
+      }
+    } catch (error) {
+      console.error('Error approving application:', error);
+      setError(error.message || 'Failed to approve application');
+      setAssigningLoan(null);
+    }
+  };
+
+  const handleReject = async (loanId) => {
+    const reason = prompt('Please provide a reason for rejection:');
+    if (!reason) return;
+    
+    try {
+      setAssigningLoan(loanId);
+      await adminService.reviewApplication(loanId, { 
+        status: 'rejected',
+        reviewComments: reason
+      });
+      await fetchLoans();
+      setAssigningLoan(null);
+    } catch (error) {
+      console.error('Error rejecting application:', error);
+      setError('Failed to reject application');
+      setAssigningLoan(null);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -86,8 +164,8 @@ const AdminLoansTable = () => {
     let bValue = b[sortBy];
     
     if (sortBy === 'applicant') {
-      aValue = a.applicant?.name || '';
-      bValue = b.applicant?.name || '';
+      aValue = `${a.applicant?.firstName || ''} ${a.applicant?.lastName || ''}`.trim();
+      bValue = `${b.applicant?.firstName || ''} ${b.applicant?.lastName || ''}`.trim();
     }
     
     if (typeof aValue === 'string') {
@@ -206,12 +284,13 @@ const AdminLoansTable = () => {
               <th onClick={() => handleSort('createdAt')} className="sortable">
                 Applied {sortBy === 'createdAt' && (sortOrder === 'asc' ? '↑' : '↓')}
               </th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedLoans.length === 0 ? (
               <tr>
-                <td colSpan="8" className="no-data">
+                <td colSpan="9" className="no-data">
                   No loan applications found
                 </td>
               </tr>
@@ -224,7 +303,7 @@ const AdminLoansTable = () => {
                   <td className="borrower-info">
                     <div className="borrower-details">
                       <span className="borrower-name">
-                        {loan.applicant?.name || 'Unknown'}
+                        {`${loan.applicant?.firstName || ''} ${loan.applicant?.lastName || ''}`.trim() || 'Unknown'}
                       </span>
                       <span className="borrower-email">
                         {loan.applicant?.email}
@@ -240,10 +319,10 @@ const AdminLoansTable = () => {
                     {formatCurrency(loan.requestedAmount)}
                   </td>
                   <td className="fee">
-                    {formatCurrency(loan.fee)}
+                    {formatCurrency(calculateLoanFee(loan.requestedAmount))}
                   </td>
                   <td className="total">
-                    {formatCurrency(loan.totalAmount)}
+                    {formatCurrency(parseFloat(loan.requestedAmount) + calculateLoanFee(loan.requestedAmount))}
                   </td>
                   <td className="purpose">
                     <div className="purpose-info">
@@ -260,6 +339,62 @@ const AdminLoansTable = () => {
                   </td>
                   <td className="date">
                     {formatDate(loan.createdAt)}
+                  </td>
+                  <td className="actions">
+                    {loan.status === 'submitted' && !loan.assignedOfficerId ? (
+                      <div className="action-buttons">
+                        <select 
+                          onChange={(e) => handleAssignOfficer(loan.id, e.target.value)}
+                          disabled={assigningLoan === loan.id}
+                          className="assign-select"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>Assign Officer</option>
+                          {loanOfficers.map(officer => (
+                            <option key={officer.id} value={officer.id}>
+                              {officer.firstName} {officer.lastName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : loan.status === 'under_review' || (loan.status === 'submitted' && loan.assignedOfficerId) ? (
+                      <div className="action-buttons">
+                        <button 
+                          onClick={() => handleApprove(loan.id)}
+                          disabled={assigningLoan === loan.id}
+                          className="approve-button"
+                          title="Approve application"
+                        >
+                          ✅ Approve
+                        </button>
+                        <button 
+                          onClick={() => handleReject(loan.id)}
+                          disabled={assigningLoan === loan.id}
+                          className="reject-button"
+                          title="Reject application"
+                        >
+                          ❌ Reject
+                        </button>
+                        {loan.assignedOfficerId && (
+                          <div className="assigned-info">
+                            Assigned: {loan.assignedOfficer?.firstName} {loan.assignedOfficer?.lastName}
+                          </div>
+                        )}
+                      </div>
+                    ) : loan.status === 'approved' || loan.status === 'rejected' ? (
+                      <div className="final-status">
+                        <span className={`final-status-text ${loan.status}`}>
+                          {loan.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                        </span>
+                        {loan.assignedOfficerId && (
+                          <div className="assigned-info">
+                            Reviewed by: {loan.assignedOfficer?.firstName} {loan.assignedOfficer?.lastName}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="no-action">-</span>
+                    )}
                   </td>
                 </tr>
               ))

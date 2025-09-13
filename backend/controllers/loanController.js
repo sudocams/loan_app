@@ -98,21 +98,21 @@ const calculateLoanTerms = async (req, res) => {
       });
     }
 
-    if (amount < loanProduct.loanAmount.min || amount > loanProduct.loanAmount.max) {
+    if (amount < loanProduct.loanAmountMin || amount > loanProduct.loanAmountMax) {
       return res.status(400).json({
         success: false,
-        message: `Loan amount must be between $${loanProduct.loanAmount.min} and $${loanProduct.loanAmount.max}`,
+        message: `Loan amount must be between KSh ${loanProduct.loanAmountMin} and KSh ${loanProduct.loanAmountMax}`,
       });
     }
 
-    if (term < loanProduct.termLength.min || term > loanProduct.termLength.max) {
+    if (term < loanProduct.termLengthMin || term > loanProduct.termLengthMax) {
       return res.status(400).json({
         success: false,
-        message: `Loan term must be between ${loanProduct.termLength.min} and ${loanProduct.termLength.max} months`,
+        message: `Loan term must be between ${loanProduct.termLengthMin} and ${loanProduct.termLengthMax} months`,
       });
     }
 
-    const estimatedRate = (loanProduct.interestRate.min + loanProduct.interestRate.max) / 2;
+    const estimatedRate = (loanProduct.interestRateMin + loanProduct.interestRateMax) / 2;
     
     const monthlyRate = estimatedRate / 100 / 12;
     const numPayments = term;
@@ -152,22 +152,18 @@ const calculateLoanTerms = async (req, res) => {
 const getUserLoans = async (req, res) => {
   try {
     const { Loan, LoanProduct } = require('../models');
-    const { status, page = 1, limit = 10 } = req.query;
+    const { status, page = 1, limit = 50 } = req.query; // Increased default limit
     
     let whereCondition = { borrowerId: req.user.id };
     if (status) {
       whereCondition.status = status;
     }
 
+    logger.info(`Getting loans for user: ${req.user.id} with condition:`, whereCondition);
+
     const loans = await Loan.findAll({
       where: whereCondition,
-      include: [
-        {
-          model: LoanProduct,
-          as: 'loanProduct',
-          attributes: ['name', 'type']
-        }
-      ],
+      // Removed loanProduct include since we're using simple loan system
       order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
       offset: (parseInt(page) - 1) * parseInt(limit)
@@ -175,20 +171,24 @@ const getUserLoans = async (req, res) => {
 
     const total = await Loan.count({ where: whereCondition });
 
+    logger.info(`Found ${loans.length} loans for user ${req.user.id}`);
+    
     res.json({
       success: true,
       data: {
         loans,
         totalPages: Math.ceil(total / limit),
-        currentPage: page,
+        currentPage: parseInt(page),
         total,
       },
     });
   } catch (error) {
     logger.error('Get user loans error:', error);
+    logger.error('Error details:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch user loans',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -314,7 +314,7 @@ const makePayment = async (req, res) => {
 
     await loan.save();
 
-    logger.info(`Payment made for loan ${loan.loanId}: $${amount}`);
+    logger.info(`Payment made for loan ${loan.loanId}: KSh ${amount}`);
 
     res.json({
       success: true,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 
@@ -125,8 +125,8 @@ const Login = () => {
           
           <div className="demo-accounts">
             <p><strong>Demo Accounts:</strong></p>
-            <p>Admin: admin@loanapp.com / Admin123!</p>
-            <p>Officer: officer@loanapp.com / Officer123!</p>
+            <p>Admin: admin@loanapp.com / Admin123456789!</p>
+            <p>Officer: officer@loanapp.com / Officer123456789!</p>
           </div>
         </div>
       </div>

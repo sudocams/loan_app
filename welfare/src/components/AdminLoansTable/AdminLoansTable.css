@@ -301,6 +301,105 @@
   background: #2980b9;
 }
 
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.approve-button, .reject-button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.approve-button {
+  background: #27ae60;
+  color: white;
+}
+
+.approve-button:hover {
+  background: #219a52;
+  transform: translateY(-1px);
+}
+
+.reject-button {
+  background: #e74c3c;
+  color: white;
+}
+
+.reject-button:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+.approve-button:disabled, 
+.reject-button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.assign-select {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #2c3e50;
+  background: white;
+  cursor: pointer;
+  max-width: 150px;
+}
+
+.assign-select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.assigned-info {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.final-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.final-status-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.final-status-text.approved {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.final-status-text.rejected {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.no-action {
+  color: #bdc3c7;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 1200px) {
   .loans-table {
     font-size: 0.8rem;

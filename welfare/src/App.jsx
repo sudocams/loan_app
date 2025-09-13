@@ -1,16 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 import StartupScript from './components/StartupScript';
-import Login from './components/Login';
-import Register from './components/Register';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard';
-import LoanApplication from './components/LoanApplication';
-import LoanSystem from './components/LoanSystem';
-import PasswordReset from './components/PasswordReset';
-import ComingSoon from './components/ComingSoon';
-import AdminLoansTable from './components/AdminLoansTable';
+import LoanApplication from './components/Loans/LoanApplication';
+import LoanSystem from './components/Loans/LoanSystem';
+import PasswordReset from './components/PasswordReset/PasswordReset';
+import ComingSoon from './components/CommingSoon/ComingSoon';
+import AdminLoansTable from './components/AdminLoansTable/AdminLoansTable';
+import ApplicationsPage from './components/ApplicationPages/ApplicationsPage';
+import UsersPage from './components/Users/UsersPage';
+import AdminLoanManagement from './components/AdminLoanManagement/AdminLoanManagement';
+import CustomerLoans from './components/CustomerLoans/CustomerLoans';
+import Contributions from './components/Contributions';
 import './App.css';
 
 function App() {
@@ -57,7 +62,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <LoanSystem>
-                      <ComingSoon title="My Applications" description="View and track your loan applications." />
+                      <ApplicationsPage />
                     </LoanSystem>
                   </ProtectedRoute>
                 } 
@@ -67,17 +72,17 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <LoanSystem>
-                      <ComingSoon title="My Loans" description="Manage your active loans and payments." />
+                      <CustomerLoans />
                     </LoanSystem>
                   </ProtectedRoute>
                 } 
               />
               <Route 
-                path="/admin/applications" 
+                path="/admin/contributions" 
                 element={
                   <ProtectedRoute>
                     <LoanSystem>
-                      <AdminLoansTable />
+                      <Contributions />
                     </LoanSystem>
                   </ProtectedRoute>
                 } 
@@ -87,7 +92,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <LoanSystem>
-                      <ComingSoon title="Loan Management" description="Manage all active loans in the system." />
+                      <AdminLoanManagement />
                     </LoanSystem>
                   </ProtectedRoute>
                 } 
@@ -107,7 +112,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <LoanSystem>
-                      <ComingSoon title="User Management" description="Manage system users and permissions." />
+                      <UsersPage />
                     </LoanSystem>
                   </ProtectedRoute>
                 } 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import Sidebar from '../Sidebar';
 import './LoanSystem.css';
 
 const LoanSystem = ({ children }) => {
@@ -15,7 +15,18 @@ const LoanSystem = ({ children }) => {
   };
 
   const handleNavigation = (page) => {
-    navigate(`/${page}`);
+    // Handle admin routes properly
+    if (page === 'contributions') {
+      navigate('/admin/contributions');
+    } else if (page === 'expenditures') {
+      navigate('/admin/expenditures');
+    } else if (page === 'admin-loans') {
+      navigate('/admin/loans');
+    } else if (page === 'users') {
+      navigate('/admin/users');
+    } else {
+      navigate(`/${page}`);
+    }
   };
 
   const handleLogout = async () => {

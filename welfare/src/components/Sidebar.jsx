@@ -12,11 +12,11 @@ const Sidebar = ({ user, onNavigate, onLogout }) => {
     if (user?.role === 'admin' || user?.role === 'loan_officer') {
       return [
         ...common,
-        { id: 'applications', icon: '📋', label: 'Applications', path: '/admin/applications' },
-        { id: 'loans', icon: '🏦', label: 'Loans', path: '/admin/loans' },
+        { id: 'contributions', icon: '💸', label: 'Contributions', path: '/admin/contributions' },
+        { id: 'expenditures', icon: '💰', label: 'Expenditures', path: '/admin/expenditures' },
+        { id: 'admin-loans', icon: '🏦', label: 'Loan Management', path: '/admin/loans' },
         { id: 'password-reset', icon: '🔑', label: 'Reset Passwords', path: '/password-reset' },
         ...(user?.role === 'admin' ? [
-          { id: 'loan-products', icon: '📊', label: 'Products', path: '/admin/products' },
           { id: 'users', icon: '👥', label: 'Users', path: '/admin/users' },
         ] : []),
       ];

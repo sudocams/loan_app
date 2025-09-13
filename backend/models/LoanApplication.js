@@ -22,7 +22,7 @@ const LoanApplication = sequelize.define('LoanApplication', {
   },
   loanProductId: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // Made optional for simple loan system
     references: {
       model: 'LoanProducts',
       key: 'id'

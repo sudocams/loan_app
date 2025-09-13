@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { applicationService } from '../services/applicationService';
+import { useAuth } from '../../contexts/AuthContext';
+import { applicationService } from '../../services/applicationService';
 import './LoanApplication.css';
 
 const LoanApplication = () => {
@@ -134,7 +134,7 @@ const LoanApplication = () => {
 
       const response = await applicationService.submitLoanApplication(submissionData);
       
-      if (response.data.success) {
+      if (response.success) {
         alert('Loan application submitted successfully! You will be notified once it has been reviewed.');
         
         // Reset form
@@ -147,7 +147,7 @@ const LoanApplication = () => {
         // Recheck eligibility
         await checkEligibility();
       } else {
-        alert(response.data.message || 'Failed to submit loan application');
+        alert(response.message || 'Failed to submit loan application');
       }
     } catch (error) {
       console.error('Error submitting application:', error);
