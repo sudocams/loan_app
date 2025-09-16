@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminService } from '../services/adminService';
+import { adminService } from '../../services/adminService';
 import './Contributions.css';
 
 const Contributions = () => {

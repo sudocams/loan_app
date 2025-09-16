@@ -17,9 +17,9 @@ const StartupScript = ({ children }) => {
         if (authService.isAuthenticated()) {
           try {
             await authService.getProfile();
-            console.log('✅ User session validated');
+            // console.log('✅ User session validated');
           } catch (error) {
-            console.log('⚠️ User session expired, redirecting to login');
+            // console.log('⚠️ User session expired, redirecting to login');
             authService.logout();
           }
         }

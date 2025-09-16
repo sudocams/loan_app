@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { loanService } from '../services/loanService';
-import { applicationService } from '../services/applicationService';
-import { adminService } from '../services/adminService';
+import { useAuth } from '../../contexts/AuthContext';
+import { loanService } from '../../services/loanService';
+import { applicationService } from '../../services/applicationService';
+import { adminService } from '../../services/adminService';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -28,13 +28,13 @@ const Dashboard = () => {
         }
         
         if (user?.role === 'customer') {
-          console.log('Fetching customer loans and applications...');
+          // console.log('Fetching customer loans and applications...');
           promises.push(loanService.getUserLoans({ limit: 5 }));
           promises.push(applicationService.getUserApplications({ limit: 5 }));
         }
         
         const results = await Promise.all(promises);
-        console.log('Dashboard API results:', results);
+        // console.log('Dashboard API results:', results);
         
         let stats = {};
         let financialMetrics = {};
@@ -51,9 +51,9 @@ const Dashboard = () => {
         if (user?.role === 'customer') {
           loans = results[resultsIndex].data.loans || [];
           applications = results[resultsIndex + 1].data.applications || [];
-          console.log('Customer dashboard - loans:', loans);
-          console.log('Customer dashboard - applications:', applications);
-          console.log('Loans data structure:', loans.length > 0 ? loans[0] : 'No loans');
+          // console.log('Customer dashboard - loans:', loans);
+          // console.log('Customer dashboard - applications:', applications);
+          // console.log('Loans data structure:', loans.length > 0 ? loans[0] : 'No loans');
         }
         
         setDashboardData({
@@ -265,13 +265,27 @@ const Dashboard = () => {
             <div className="stat-card">
               <div className="stat-icon">💳</div>
               <div className="stat-content">
-                <h3>Total Borrowed</h3>
+                <h3>Loan plus loan fee</h3>
                 <p className="stat-number">
                   {formatCurrency(
                     dashboardData.loans?.reduce((sum, loan) => {
                       const principal = parseFloat(loan.principalAmount) || 0;
                       const processingFee = parseFloat(loan.processingFees) || 0;
                       return sum + principal + processingFee;
+                    }, 0)
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">💰</div>
+              <div className="stat-content">
+                <h3>Actual Amount Borrowed</h3>
+                <p className="stat-number">
+                  {formatCurrency(
+                    dashboardData.loans?.reduce((sum, loan) => {
+                      const principal = parseFloat(loan.principalAmount) || 0;
+                      return sum + principal;
                     }, 0)
                   )}
                 </p>
@@ -289,7 +303,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon">⚖️</div>
               <div className="stat-content">
                 <h3>Current Balance</h3>
                 <p className="stat-number">

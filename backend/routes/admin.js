@@ -60,10 +60,10 @@ router.post('/contributions', createContribution);
 router.put('/contributions/:contributionId', updateContribution);
 
 // Expenditures management
+router.get('/expenditures/summary', getExpenditureSummary);
 router.get('/expenditures', getAllExpenditures);
 router.post('/expenditures', createExpenditure);
 router.put('/expenditures/:expenditureId', updateExpenditure);
 router.delete('/expenditures/:expenditureId', deleteExpenditure);
-router.get('/expenditures/summary', getExpenditureSummary);
 
 module.exports = router;

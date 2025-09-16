@@ -5,7 +5,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import StartupScript from './components/StartupScript';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/Dashboard/Dashboard';
 import LoanApplication from './components/Loans/LoanApplication';
 import LoanSystem from './components/Loans/LoanSystem';
 import PasswordReset from './components/PasswordReset/PasswordReset';
@@ -15,7 +15,8 @@ import ApplicationsPage from './components/ApplicationPages/ApplicationsPage';
 import UsersPage from './components/Users/UsersPage';
 import AdminLoanManagement from './components/AdminLoanManagement/AdminLoanManagement';
 import CustomerLoans from './components/CustomerLoans/CustomerLoans';
-import Contributions from './components/Contributions';
+import Contributions from './components/Contributions/Contributions';
+import Expenditures from './components/Expenditure/Expenditures';
 import './App.css';
 
 function App() {
@@ -83,6 +84,16 @@ function App() {
                   <ProtectedRoute>
                     <LoanSystem>
                       <Contributions />
+                    </LoanSystem>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/expenditures" 
+                element={
+                  <ProtectedRoute>
+                    <LoanSystem>
+                      <Expenditures />
                     </LoanSystem>
                   </ProtectedRoute>
                 } 

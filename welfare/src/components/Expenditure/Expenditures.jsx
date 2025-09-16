@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminService } from '../services/adminService';
+import { adminService } from '../../services/adminService';
 import './Expenditures.css';
 
 const Expenditures = () => {
@@ -61,12 +61,19 @@ const Expenditures = () => {
 
   const fetchSummary = async () => {
     try {
+      console.log('Fetching expenditure summary...');
       const response = await adminService.getExpenditureSummary();
+      console.log('Expenditure summary response:', response);
       if (response?.success) {
-        setSummary(response.data?.summary || {});
+        const summaryData = response.data?.summary || {};
+        console.log('Summary data:', summaryData);
+        setSummary(summaryData);
+      } else {
+        console.error('Summary API error:', response?.message);
       }
     } catch (error) {
       console.error('Error fetching expenditure summary:', error);
+      console.error('Error details:', error.response?.data);
     }
   };
 
@@ -233,7 +240,8 @@ const Expenditures = () => {
           <div className="stat-icon">💸</div>
           <div className="stat-content">
             <h3>Total Paid</h3>
-            <p className="stat-number">{formatCurrency(summary.totalAmountPaid)}</p>
+            <p className="stat-number">{formatCurrency(summary.totalAmountPaid || 0)}</p>
+            
           </div>
         </div>
       </div>

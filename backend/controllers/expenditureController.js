@@ -237,6 +237,8 @@ const updateExpenditure = async (req, res) => {
 
 const getExpenditureSummary = async (req, res) => {
   try {
+    logger.info('Fetching expenditure summary statistics...');
+    
     // Get expenditure statistics
     const [
       totalExpenditures,
@@ -280,6 +282,8 @@ const getExpenditureSummary = async (req, res) => {
         return acc;
       }, {})
     };
+
+    logger.info('Expenditure summary calculated:', JSON.stringify(summary, null, 2));
 
     res.json({
       success: true,

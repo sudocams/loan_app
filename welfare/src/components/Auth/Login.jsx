@@ -123,11 +123,11 @@ const Login = () => {
             </Link>
           </p>
           
-          <div className="demo-accounts">
+          {/* <div className="demo-accounts">
             <p><strong>Demo Accounts:</strong></p>
             <p>Admin: admin@loanapp.com / Admin123456789!</p>
             <p>Officer: officer@loanapp.com / Officer123456789!</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

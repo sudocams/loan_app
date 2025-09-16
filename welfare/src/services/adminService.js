@@ -70,4 +70,26 @@ export const adminService = {
   async getFinancialMetrics() {
     return await api.get('/admin/financial-metrics');
   },
+
+  // Expenditure management
+  async getExpenditures(filters = {}) {
+    const params = new URLSearchParams(filters).toString();
+    return await api.get(`/admin/expenditures${params ? `?${params}` : ''}`);
+  },
+
+  async createExpenditure(expenditureData) {
+    return await api.post('/admin/expenditures', expenditureData);
+  },
+
+  async updateExpenditure(expenditureId, updates) {
+    return await api.put(`/admin/expenditures/${expenditureId}`, updates);
+  },
+
+  async deleteExpenditure(expenditureId) {
+    return await api.delete(`/admin/expenditures/${expenditureId}`);
+  },
+
+  async getExpenditureSummary() {
+    return await api.get('/admin/expenditures/summary');
+  },
 };
